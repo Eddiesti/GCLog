@@ -1,39 +1,36 @@
 package ru.otus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
-public class Benchmark implements BenchmarkMBean {
-    private volatile int size = 0;
-
-    public void setValues() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                System.out.println("Starting the loop");
-                int local = size;
-                Object[] array = new Object[local];
-                System.out.println("Array of size: " + array.length + " created");
-                for(int i = 0; i < local; i++){
-                    array[i] = new Student("1","2",3);
+public class Benchmark {
+    private static void run() {
+        List<String> list = new LinkedList<>();
+        int size = 100_000;
+        while (true) {
+            for (int i = 0; i < size; i++) {
+                list.add(new String(new char[0]));
+                if (i % 100 == 0) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                System.out.println("Created " + local + " objects.");
-                GC.printGCMetrics();
             }
-        }, 0, 1);
+            list.subList(0, size / 2).clear();
+            GC.printGCMetrics();
+            try {
+                Thread.sleep(4500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
-
-    @Override
-    public int getSize() {
-        return size;
+    void pringGCLogs() {
+        Thread thread = new Thread(Benchmark::run);
+        thread.start();
     }
 
-    @Override
-    public void setSize(int size) {
-        this.size = size;
-    }
 }

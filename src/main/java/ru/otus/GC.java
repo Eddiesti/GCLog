@@ -19,45 +19,23 @@ public class GC {
         OLD_GC.add("G1 Old Generation");
     }
 
-    static long minorCount = 0;
-    static long minorTime = 0;
-    static long majorCount = 0;
-    static long majorTime = 0;
-    static long unknownCount = 0;
-    static long unknownTime = 0;
-
-    public static void printGCMetrics()   {
-
-
+    public static void printGCMetrics() {
         List<GarbageCollectorMXBean> mxBeans
                 = ManagementFactory.getGarbageCollectorMXBeans();
+
         for (GarbageCollectorMXBean gc : mxBeans) {
             long count = gc.getCollectionCount();
             if (count >= 0) {
                 if (YOUNG_GC.contains(gc.getName())) {
-                    minorCount += count;
-                    minorTime += gc.getCollectionTime();
+                    System.out.print("MinorGC -> Count: " + count);
+                    System.out.print(", Time (ms): " + gc.getCollectionTime());
                 } else if (OLD_GC.contains(gc.getName())) {
-                    majorCount += count;
-                    majorTime += gc.getCollectionTime();
-                } else {
-                    unknownCount += count;
-                    unknownTime += gc.getCollectionTime();
+                    System.out.print(", MajorGC -> Count: " + count);
+                    System.out.print(", Time (ms): " + gc.getCollectionTime());
+                    System.out.println();
                 }
             }
         }
-
-        final StringBuilder sb = new StringBuilder();
-        sb.append("MinorGC -> Count: ").append(minorCount)
-                .append(", Time (ms): ").append(minorTime)
-                .append(", MajorGC -> Count: ").append(majorCount)
-                .append(", Time (ms): ").append(majorTime);
-
-        if (unknownCount > 0) {
-            sb.append(", UnknownGC -> Count: ").append(unknownCount)
-                    .append(", Time (ms): ").append(unknownTime);
-        }
-        System.out.println(sb);
     }
 
 }
